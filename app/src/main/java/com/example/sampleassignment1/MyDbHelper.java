@@ -102,5 +102,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
         if(isSelected.matches("1")) return true;
         else return false;
     }
-
+    public String getSelectedFromUser(String user){
+        return user.split(",")[1];
+    }
 }

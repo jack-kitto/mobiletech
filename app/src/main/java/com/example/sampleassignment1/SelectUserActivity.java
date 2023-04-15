@@ -41,8 +41,6 @@ public class SelectUserActivity extends AppCompatActivity {
         super.onResume();
         users = myDbHelper.getAllUsers();
         if(!users.isEmpty())displayUsers();
-        if(users.isEmpty())Log.d("D", "EMPTY");
-        else Log.d("D", "NOT EMPTY");
     }
 
     public void displayUsers(){
@@ -52,13 +50,7 @@ public class SelectUserActivity extends AppCompatActivity {
         RadioButton rb1 = findViewById(R.id.rb1);
         RadioButton rb2 = findViewById(R.id.rb2);
         RadioButton rb3 = findViewById(R.id.rb3);
-        TextView textView = findViewById(R.id.tv2);
-        RadioGroup radioGroup = findViewById(R.id.rg1);
-        Button btn2 = findViewById(R.id.btn2);
 
-        textView.setVisibility(View.VISIBLE);
-        radioGroup.setVisibility(View.VISIBLE);
-        btn2.setVisibility(View.VISIBLE);
         for (String user : users) {
             Log.d("D", "USER: " + user);
             String name = myDbHelper.getNameFromUser(user);
@@ -89,7 +81,16 @@ public class SelectUserActivity extends AppCompatActivity {
                 }
             }
         }
-
+        if(!usernamesAreValid()) setVisibility(View.INVISIBLE);
+        else setVisibility(View.VISIBLE);
+    }
+    public void setVisibility(int visibility){
+        TextView textView = findViewById(R.id.tv2);
+        RadioGroup radioGroup = findViewById(R.id.rg1);
+        Button btn2 = findViewById(R.id.btn2);
+        textView.setVisibility(visibility);
+        radioGroup.setVisibility(visibility);
+        btn2.setVisibility(visibility);
     }
     public boolean usernamesAreValid(){
         EditText et1 = findViewById(R.id.et1);
@@ -108,33 +109,33 @@ public class SelectUserActivity extends AppCompatActivity {
         return true;
     }
     public void save(View view) {
-        if(!usernamesAreValid())return;
         EditText et1 = findViewById(R.id.et1);
         EditText et2 = findViewById(R.id.et2);
         EditText et3 = findViewById(R.id.et3);
-        TextView textView = findViewById(R.id.tv2);
-        RadioGroup radioGroup = findViewById(R.id.rg1);
         RadioButton rb1 = findViewById(R.id.rb1);
         RadioButton rb2 = findViewById(R.id.rb2);
         RadioButton rb3 = findViewById(R.id.rb3);
-        Button btn2 = findViewById(R.id.btn2);
         String user1 = et1.getText().toString();
         String user2 = et2.getText().toString();
         String user3 = et3.getText().toString();
 
-        myDbHelper.deleteAllUsers();
+        if(usernamesAreValid()) myDbHelper.deleteAllUsers();
         if(showUserSelector == View.INVISIBLE)showUserSelector = View.VISIBLE;
         else showUserSelector = View.INVISIBLE;
         rb1.setText(user1);
         rb2.setText(user2);
         rb3.setText(user3);
-        textView.setVisibility(showUserSelector);
-        radioGroup.setVisibility(showUserSelector);
-        btn2.setVisibility((showUserSelector));
+
         myDbHelper.insertUser(user1, "0");
         myDbHelper.insertUser(user2, "0");
         myDbHelper.insertUser(user3, "0");
         users = myDbHelper.getAllUsers();
+
+        if(!usernamesAreValid()) {
+            setVisibility(View.INVISIBLE);
+            return;
+        }
+        setVisibility(View.VISIBLE);
     }
     public void logAllUsers(){
         for (String user: myDbHelper.getAllUsers()) {
@@ -143,7 +144,8 @@ public class SelectUserActivity extends AppCompatActivity {
     }
 
     public void start(View view){
-        if(selectedUserName.isEmpty()) return;
+        if(selectedUserName.isEmpty() | !usernamesAreValid()) return;
+
         String newSelectedUser = "";
 
         for (String user : users) {

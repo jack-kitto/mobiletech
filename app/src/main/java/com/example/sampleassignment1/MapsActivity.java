@@ -4,7 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,7 +36,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     SupportMapFragment mapFragment;
     SupportStreetViewPanoramaFragment streetViewPanoramaFragment;
     StreetViewPanorama mStreetViewPanorama;
-
+    User registeredUser;
+    User currentUser;
     double latitude;
     double longitude;
     LatLng latLngRed, latLngBlue;
@@ -47,7 +52,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     MyLocationPlaceMap myLocationPlaceMap;
     ArrayList<MyLocationPlace> myLocations = new ArrayList<>();
     MyLocationPlace myLocation;
+public void handleCurrentUser(){
+    UserFirebaseRecord record = currentUser.data.get(currentUser.data.size() - 1);
+    Log.d("D", "PRINTING CURRENT USER RECORD");
+    record.print();
+    latitude = record.latitude;
+    longitude = record.longitude;
+    latLngRed = new LatLng(latitude, longitude);
+    address = record.address;
 
+    textViewAddress = findViewById(R.id.textViewStreetAddress);
+    textViewAddress.setText("Address: " + address);
+    textViewLatitude = findViewById(R.id.textViewLatitude);
+    textViewLatitude.setText("Latitude: " + latitude);
+    textViewLongitude = findViewById(R.id.textViewLongitude);
+    textViewLongitude.setText("Longitude: " + longitude);
+}
+
+public void handleRegisteredUser(){
+
+}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,31 +82,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnMapStreetView = findViewById(R.id.buttonMapStreetView);
 
         Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            latitude = extras.getDouble("lat");
-            longitude = extras.getDouble("lng");
-            latLngRed = new LatLng(latitude, longitude);
-            address = extras.getString("addr");
+        Intent myIntent = getIntent();
 
-            textViewAddress = findViewById(R.id.textViewStreetAddress);
-            textViewAddress.setText("Address: " + address);
-            textViewLatitude = findViewById(R.id.textViewLatitude);
-            textViewLatitude.setText("Latitude: " + latitude);
-            textViewLongitude = findViewById(R.id.textViewLongitude);
-            textViewLongitude.setText("Longitude: " + longitude);
-        }
+        registeredUser = (User) myIntent.getSerializableExtra("registeredUser", User.class);
+        currentUser = (User) myIntent.getSerializableExtra("currentUser", User.class);
+        Log.d("D", "START PRINTING REGISTERED USERS DATA");
+        registeredUser.printData();
+        Log.d("D", "PRINTING REGISTERED USERS DATA");
 
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        if(currentUser.name.matches(registeredUser.name)) handleCurrentUser();
+        else handleRegisteredUser();
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        streetViewPanoramaFragment =
-                (SupportStreetViewPanoramaFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.streetView);
+        streetViewPanoramaFragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.streetView);
         streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
-
         mapFragment.getView().bringToFront();
-
         myLocationPlaceMap = new MyLocationPlaceMap(getApplicationContext(), MapsActivity.this);
     }
 
@@ -95,47 +110,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.clear();
-        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                redMarker = mMap.addMarker(new MarkerOptions()
-                        .title("Show Surroundings")
-                        .snippet("Latitude: " + latitude + ", Longitude: " + longitude +
-                                "\nAddress: " + address)
-                        .position(latLngRed)
-                );
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngRed, 14));
-            }
-        });
+        if(currentUser.name.matches(registeredUser.name)) handleCurrentUser(mMap);
+        else handleRegisteredUser(mMap);
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @SuppressLint("PotentialBehaviorOverride")
             @Override
             public boolean onMarkerClick(@NonNull Marker marker) {
-                if (marker.equals(redMarker)) {
-                    streetViewPanoramaFragment.getView().bringToFront();
-                    btnMapStreetView.setText("Show map");
-                    showMap = false;
-                    return true;
-                } else {
-                    return false;
-                }
-
+                if (!marker.equals(redMarker)) return false;
+                streetViewPanoramaFragment.getView().bringToFront();
+                btnMapStreetView.setText("Show map");
+                showMap = false;
+                return true;
             }
         });
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(@NonNull Marker marker) {
-                if (!marker.getId().equals(redMarker.getId())) {
-                    streetViewPanoramaFragment.getView().bringToFront();
-                    latLngBlue = marker.getPosition();
-                    mStreetViewPanorama.setPosition(latLngBlue);
+                if (marker.getId().equals(redMarker.getId())) return;
+                streetViewPanoramaFragment.getView().bringToFront();
+                latLngBlue = marker.getPosition();
+                mStreetViewPanorama.setPosition(latLngBlue);
                 }
-            }
         });
 
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -143,6 +145,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public View getInfoWindow(Marker marker) {
                 return null;
             }
+            @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
             @Override
             public View getInfoContents(Marker marker) {
                 View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
@@ -162,6 +165,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return infoWindow;
             }
         });
+
+    }
+
+    @SuppressLint("PotentialBehaviorOverride")
+    private void handleCurrentUser(GoogleMap mMap) {
+        UserFirebaseRecord record = currentUser.data.get(currentUser.data.size() - 1);
+        LatLng latLng = new LatLng(record.latitude, record.longitude);
+
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                redMarker = mMap.addMarker(new MarkerOptions()
+                        .title("Show Surroundings")
+                        .snippet("Latitude: " + record.latitude + ", Longitude: " + record.longitude +
+                                "\nAddress: " + record.address)
+                        .position(latLng)
+                );
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+            }
+        });
+
+
+    }
+    private void handleRegisteredUser(GoogleMap mMap) {
     }
 
     @Override

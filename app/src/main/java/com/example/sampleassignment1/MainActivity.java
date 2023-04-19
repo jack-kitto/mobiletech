@@ -76,10 +76,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void whereAmI (View view) {
+        Log.d("D", "WHERE AM I");
         int userIndex = 0;
         User user = users.get(userIndex);
 
         if (myLocations.size() <= 0) return;
+
         myLocationPlaceMap.getLatLngAddress(myLocations);
         myLocation = myLocations.get(0);
         myLocations.clear();

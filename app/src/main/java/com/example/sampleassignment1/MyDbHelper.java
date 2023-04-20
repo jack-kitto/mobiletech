@@ -16,7 +16,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_NAME = "LocationTracker";
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_NAME = "colour";
+    public static final String COLUMN_NAME = "name";
     public static final String COLUMN_ISSELECTED = "isSelected";
 
 
@@ -45,6 +45,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
     public long insertUser(String user, String isSelected) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME, user);
         contentValues.put(COLUMN_ISSELECTED, isSelected);

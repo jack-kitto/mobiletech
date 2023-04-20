@@ -1,5 +1,7 @@
 package com.example.sampleassignment1;
 
+import android.util.Log;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -11,12 +13,22 @@ public class User implements Serializable {
     public String name;
     public String selected;
     public ArrayList<UserFirebaseRecord> data;
+    String SELECTED = "1";
+    String NOT_SELECTED = "0";
 
     public User(String id, String name, String selected) {
         this.id = id;
         this.name = name;
         this.selected = selected;
         this.data = new ArrayList<>();
+    }
+
+    public void print(){
+        Log.d("D", "    NAME: " + this.name);
+        Log.d("D", "      id: " + this.id);
+        Log.d("D", "selected: " + this.selected);
+        if(this.data.isEmpty())Log.d("D", " records: empty");
+        else Log.d("D", " records: " + this.data.size());
     }
 
     public void printData() {

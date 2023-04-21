@@ -41,45 +41,45 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        users = new Users(this);
-        users.print();
-        myLocationPlaceMap = new MyLocationPlaceMap(getApplicationContext(), MainActivity.this);
-        myLocationPlaceMap.requestPermissions();
-        myLocationPlaceMap.getLatLngAddress(myLocations);
-        myDbHelper = new MyDbHelper(this, "sampleassignment1", null, 1);
-        Button buttonWhereAmI = findViewById(R.id.buttonWhereAmI);
-        Button buttonWhereIsUser2 = findViewById(R.id.buttonWhereIsUser2);
-        Button buttonWhereIsUser3 = findViewById(R.id.buttonWhereIsUser3);
-        db_users = myDbHelper.getAllUsers();
-        users = new ArrayList<>();
-
-        boolean isUser2Set = false;
-        for(int i = 0; i < 3; i++) {
-            User user = new User(
-                myDbHelper.getIdFromUser(db_users.get(i)),
-                myDbHelper.getNameFromUser(db_users.get(i)),
-                myDbHelper.getSelectedFromUser(db_users.get(i))
-            );
-            users.add(user);
-//            downloadClassInstanceFromRealtimeDB(user.name);
-            if(user.selected.matches("1")){
-                currentUser = user;
-                buttonWhereAmI.setText("WHERE AM I? (" + user.name + ")");
-            }
-            else if(!isUser2Set){
-                buttonWhereIsUser2.setText("WHERE IS " + user.name);
-                isUser2Set = true;
-            }else buttonWhereIsUser3.setText("WHERE IS " + user.name);
-        }
-        String user1 = users.get(0).name;
-        String user2 = users.get(1).name;
-        String user3 = users.get(2).name;
-        user1Ref = FirebaseDatabase.getInstance().getReference(user1);
-        user2Ref = FirebaseDatabase.getInstance().getReference(user2);
-        user3Ref = FirebaseDatabase.getInstance().getReference(user3);
-        user1Ref.addChildEventListener(childEventListener);
-        user2Ref.addChildEventListener(childEventListener);
-        user3Ref.addChildEventListener(childEventListener);
+//        users = new Users(this);
+//        users.print();
+//        myLocationPlaceMap = new MyLocationPlaceMap(getApplicationContext(), MainActivity.this);
+//        myLocationPlaceMap.requestPermissions();
+//        myLocationPlaceMap.getLatLngAddress(myLocations);
+//        myDbHelper = new MyDbHelper(this, "sampleassignment1", null, 1);
+//        Button buttonWhereAmI = findViewById(R.id.buttonWhereAmI);
+//        Button buttonWhereIsUser2 = findViewById(R.id.buttonWhereIsUser2);
+//        Button buttonWhereIsUser3 = findViewById(R.id.buttonWhereIsUser3);
+//        db_users = myDbHelper.getAllUsers();
+//        users = new ArrayList<>();
+//
+//        boolean isUser2Set = false;
+//        for(int i = 0; i < 3; i++) {
+//            User user = new User(
+//                myDbHelper.getIdFromUser(db_users.get(i)),
+//                myDbHelper.getNameFromUser(db_users.get(i)),
+//                myDbHelper.getSelectedFromUser(db_users.get(i))
+//            );
+//            users.add(user);
+////            downloadClassInstanceFromRealtimeDB(user.name);
+//            if(user.selected.matches("1")){
+//                currentUser = user;
+//                buttonWhereAmI.setText("WHERE AM I? (" + user.name + ")");
+//            }
+//            else if(!isUser2Set){
+//                buttonWhereIsUser2.setText("WHERE IS " + user.name);
+//                isUser2Set = true;
+//            }else buttonWhereIsUser3.setText("WHERE IS " + user.name);
+//        }
+//        String user1 = users.get(0).name;
+//        String user2 = users.get(1).name;
+//        String user3 = users.get(2).name;
+//        user1Ref = FirebaseDatabase.getInstance().getReference(user1);
+//        user2Ref = FirebaseDatabase.getInstance().getReference(user2);
+//        user3Ref = FirebaseDatabase.getInstance().getReference(user3);
+//        user1Ref.addChildEventListener(childEventListener);
+//        user2Ref.addChildEventListener(childEventListener);
+//        user3Ref.addChildEventListener(childEventListener);
 
 
     }

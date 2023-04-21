@@ -121,6 +121,7 @@ public class Users implements Serializable{
         for(int i = 0; i < 3; i++){
             ets.get(i).setText(users.get(i).name);
             if(users.get(i).selected == SELECTED){
+                Log.d("D", "#!#!#!#!#!#!#!# SELECTED USER: " + users.get(i).name);
                 rbs.get(i).setChecked(true);
                 rbs.get(i).setSelected(true);
             }

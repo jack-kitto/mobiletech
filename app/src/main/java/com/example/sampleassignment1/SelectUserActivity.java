@@ -30,6 +30,7 @@ public class SelectUserActivity extends AppCompatActivity {
     }
 
     public void createUsers(){
+        Log.d("D", "CREATING USERS @#$@!#$@#$");
         EditText et1 = findViewById(R.id.et1);
         EditText et2 = findViewById(R.id.et2);
         EditText et3 = findViewById(R.id.et3);
@@ -44,7 +45,11 @@ public class SelectUserActivity extends AppCompatActivity {
             users.setSelectedUser(selectedUserName);
         });
         Boolean error = users.load();
-        if(error)return;
+        if(error){
+            Log.d("D", "Error loading users!!!!!!!!!!!!");
+            return;
+        };
+        users.print();
         this.users.display();
         setVisibility(View.VISIBLE);
     }
